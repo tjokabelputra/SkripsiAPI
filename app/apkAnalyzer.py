@@ -1,8 +1,9 @@
 import csv
 from androguard.misc import AnalyzeAPK
+from app.core.constants import FEATURE_CSV
 
 # Load Filter
-def load_feature_whitelist(csv_path="features/cols.csv"):
+def load_feature_whitelist(csv_path=FEATURE_CSV):
     whitelist = set()
     with open(csv_path, 'r', encoding="utf-8") as f:
         read = csv.reader(f)
