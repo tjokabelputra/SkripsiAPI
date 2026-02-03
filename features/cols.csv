@@ -18633,7 +18633,6 @@ APICall::Landroid/util/MonthDisplayHelper.getYear()
 APICall::Landroid/util/MonthDisplayHelper.getNumberOfDaysInMonth()
 APICall::Landroid/util/MonthDisplayHelper.getFirstDayOfMonth()
 APICall::Landroid/util/MonthDisplayHelper.getColumnOf()
-CLASS
 APICall::Landroid/os/Debug.resetThreadGcInvocationCount()
 APICall::Landroid/os/Debug.resetGlobalFreedCount()
 APICall::Landroid/os/Debug.resetThreadAllocSize()
