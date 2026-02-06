@@ -55,15 +55,17 @@ def background_extract(task_id: str, apk_bytes: bytes, filename_hint: str):
 
         # Success state
         task_store[task_id]["status"] = "completed"
+        task_store[task_id]["error"] = None
         task_store[task_id]["json_path"] = json_path
+        task_store[task_id]["apk_size_bytes"] = len(apk_bytes)
         task_store[task_id]["end_time"] = end_iso
         task_store[task_id]["duration_seconds"] = duration
-        task_store[task_id]["error"] = None
 
     except Exception as e:
         end_iso = iso_now()
         task_store[task_id]["status"] = "failed"
-        task_store[task_id]["json_path"] = None
         task_store[task_id]["error"] = str(e)
+        task_store[task_id]["json_path"] = None
+        task_store[task_id]["apk_size_bytes"] = 0
         task_store[task_id]["end_time"] = end_iso
         task_store[task_id]["duration_seconds"] = None

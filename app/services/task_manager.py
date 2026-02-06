@@ -11,12 +11,13 @@ def load_task_from_disk(task_id: str):
 
         return {
             "status": "completed",
-            "json_path": str(json_path),
             "error": None,
+            "json_path": str(json_path),
+            "apk_name": data["metadata"].get("apk_name"),
+            "apk_size_bytes": data["metadata"].get("apk_size_bytes"),
             "start_time": data["metadata"].get("start_time"),
             "end_time": data["metadata"].get("end_time"),
             "duration_seconds": data["metadata"].get("duration_seconds"),
-            "apk_name": data["metadata"].get("apk_name"),
         }
 
     return None

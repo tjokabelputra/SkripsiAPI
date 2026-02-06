@@ -1,31 +1,28 @@
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, Any
 
-class SubmitApkResponse(BaseModel):
-    task_id: str
-    message: str
-
-class GetAPKExtractionStatusResponse(BaseModel):
+class ResponseMessage(BaseModel):
+    code: int
     status: str
-    json_path: Optional[str] = None
-    error: Optional[str] = None
-    start_time: str
-    end_time: Optional[str] = None
-    duration_seconds: Optional[float] = None
-    apk_name: str
+    data: Optional[Any] = None
+    message: Optional[str] = None
+
+class SubmitApkData(BaseModel):
+    task_id: str
 
 class ExtractionMetadata(BaseModel):
     task_id: str
     apk_name: str
-    apk_size_byte: int
+    apk_size_bytes: int
     start_time: str
-    end_time: str
-    duration_seconds: float
+    end_time: Optional[str] = None
+    duration_seconds: Optional[float] = None
 
-class GetAPKExtractionResult(BaseModel):
+class ExtractionStatus(BaseModel):
+    status: str
+    error: Optional[str] = None
     metadata: ExtractionMetadata
-    extraction_id: str
-    pca: List[float]
 
-class DeleteAPKExtractionResult(BaseModel):
-    message: str
+class ExtractionResultData(BaseModel):
+    metadata: ExtractionMetadata
+    pca: List[float]
