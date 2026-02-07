@@ -1,2 +1,3 @@
-data/results
-data/prec
+data/ann/
+data/ens/
+data/results/

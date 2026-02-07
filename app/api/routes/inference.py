@@ -1,9 +1,14 @@
 import json
 import os
+from http.client import responses
+
 import tensorflow as tf
 import numpy as np
 from fastapi import APIRouter, HTTPException
-from app.core.constants import MODEL_DIR, PREC_DIR
+from starlette.responses import JSONResponse
+
+from app.core.constants import MODEL_DIR, ANN_DIR, ENS_DIR
+from app.models.schemas import ResponseMessage
 from app.services.pca_processor import load_pca_np
 from app.services.task_manager import load_result_from_disk
 
@@ -18,7 +23,18 @@ label_mapping = {0: "Benign", 1: "Malware"}
 
 router = APIRouter(prefix="/inference", tags=["Model Inference"])
 
-@router.post("/ann")
+@router.post(
+    "/ann",
+    status_code=201,
+    response_model=ResponseMessage,
+    summary="Ann inference",
+    description="Get Inference Result From ANN",
+    responses={
+        500:{
+            "description": "Internal Server Error",
+            "model": ResponseMessage
+        }
+    })
 def predict_ann_smote(task_id: str):
     pca_np = load_pca_np(task_id)
 
@@ -38,16 +54,38 @@ def predict_ann_smote(task_id: str):
             "benign_probability_percent": benign_percent
         }
 
-        predict_path = os.path.join(PREC_DIR, f"predict_{task_id}.json")
+        predict_path = os.path.join(ANN_DIR, f"predict_{task_id}.json")
 
         with open(predict_path, "w") as f:
             json.dump(prediction_result, f, indent=4)
 
-        return prediction_result
+        return ResponseMessage(
+            code=201,
+            status="success",
+            data=prediction_result
+        )
     except Exception as e:
-        raise HTTPException(500, "Internal Server Error")
+        return JSONResponse(
+            status_code=500,
+            content=ResponseMessage(
+                code=500,
+                status="failed",
+                message="Internal Server Error",
+            ).model_dump()
+        )
 
-@router.post("/ensemble")
+@router.post(
+    "/ensemble",
+    status_code=201,
+    response_model=ResponseMessage,
+    summary="Ensemble inference",
+    description="Get Inference Result From ANN Ensemble",
+    responses={
+        500:{
+            "description": "Internal Server Error",
+            "model": ResponseMessage
+        }
+    })
 def predict_ann_ensemble(task_id: str):
     pca_np = load_pca_np(task_id)
 
@@ -84,30 +122,101 @@ def predict_ann_ensemble(task_id: str):
             "benign_probability_percent": benign_percent
         }
 
-        predict_path = os.path.join(PREC_DIR, f"predict_{task_id}.json")
+        predict_path = os.path.join(ENS_DIR, f"predict_{task_id}.json")
 
         with open(predict_path, "w") as f:
             json.dump(prediction_result, f, indent=4)
 
-        return prediction_result
+        return ResponseMessage(
+            code=201,
+            status="success",
+            data=prediction_result
+        )
 
     except Exception as e:
-        raise HTTPException(500, "Internal Server Error")
+        return JSONResponse(
+            status_code=500,
+            content=ResponseMessage(
+                code=500,
+                status="failed",
+                message="Internal Server Error",
+            ).model_dump()
+        )
 
-@router.get("/get/{task_id}")
-def get_prediction(task_id: str):
-    result = load_result_from_disk(task_id)
+@router.get(
+    "/get/{task_id}",
+    response_model=ResponseMessage,
+    summary="Get Inference Result",
+    description="Get Inference Result from ANN or Ensemble",
+    responses={
+        400: {
+            "description": "Invalid inference type",
+            "model": ResponseMessage
+        },
+        404: {
+            "description": "Result not found",
+            "model": ResponseMessage
+        },
+    },
+)
+def get_prediction(task_id: str, type: str):
+    try:
+        result = load_result_from_disk(task_id, type)
+    except ValueError:
+        return JSONResponse(
+            status_code=400,
+            content=ResponseMessage(
+                code=400,
+                status="failed",
+                message="Invalid inference type",
+            ).model_dump()
+        )
+
     if result is None:
-        raise HTTPException(404, "Result not found")
+        return JSONResponse(
+            status_code=404,
+            content=ResponseMessage(
+                code=404,
+                status="failed",
+                message="Result not found",
+            ).model_dump()
+        )
 
-    result.pop("json_path")
-    return result
+    final_res = dict(result)
+    final_res.pop("json_path", None)
 
-@router.delete("/delete/{task_id}")
-def delete_prediction(task_id: str):
-    result = load_result_from_disk(task_id)
+    return ResponseMessage(
+        code=200,
+        status="success",
+        data=final_res,
+    )
+
+@router.delete(
+    "/delete/{task_id}",
+    response_model=ResponseMessage,
+    summary="Delete Inference Result",
+    description="Delete Inference Result from ANN or Ensemble",
+    responses={
+        404:{
+            "description": "Result not found",
+            "model": ResponseMessage
+        }
+    })
+def delete_prediction(task_id: str, type: str):
+    result = load_result_from_disk(task_id, type)
     if result is None:
-        raise HTTPException(404, "Result not found")
+        return JSONResponse(
+            status_code=404,
+            content=ResponseMessage(
+                code=404,
+                status="failed",
+                message="Result not found",
+            ).model_dump()
+        )
 
     os.remove(result.get("json_path"))
-    return {"status": "deleted", "task_id": task_id}
+    return ResponseMessage(
+        code=200,
+        status="success",
+        message="Result successfully deleted"
+    )
