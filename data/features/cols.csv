@@ -1,6 +1,4 @@
 ColumnName
-API_MIN
-API
 Permission::WAKE_LOCK
 Permission::WRITE_EXTERNAL_STORAGE
 Permission::ACCESS_NETWORK_STATE

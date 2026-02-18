@@ -1,6 +1,5 @@
 import json
 from app.core.constants import RESULT_DIR, ANN_DIR, ENS_DIR
-from app.models.schemas import ResponseMessage
 
 task_store: dict[str, dict] = {}
 

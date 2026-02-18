@@ -15,21 +15,12 @@ def load_feature_cols(csv_path):
 
 def encode_features(features: dict, features_columns: list):
     apk_feature_set = set()
-    for key in ["permissions", "intents", "api_calls"]:
+    for key in ["permissions", "intents"]:
         apk_feature_set.update(features.get(key, []))
 
     row = []
     for col in features_columns:
-        if col == "API_MIN":
-            value = features.get("min_sdk")
-            row.append(int(value) if value is not None else 0)
-
-        elif col == "API":
-            value = features.get("target_sdk")
-            row.append(int(value) if value is not None else 0)
-
-        else:
-            row.append(1 if col in apk_feature_set else 0)
+        row.append(1 if col in apk_feature_set else 0)
 
     return row
 

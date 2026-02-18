@@ -1,15 +1,12 @@
+"""
 import json
 import os
-from http.client import responses
-
 import tensorflow as tf
 import numpy as np
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from starlette.responses import JSONResponse
-
 from app.core.constants import MODEL_DIR, ANN_DIR, ENS_DIR
 from app.models.schemas import ResponseMessage
-from app.services.pca_processor import load_pca_np
 from app.services.task_manager import load_result_from_disk
 
 ensemble_names = ["ANN1.keras", "ANN2.keras", "ANN3.keras", "ANN4.keras", "ANN5.keras"]
@@ -220,3 +217,4 @@ def delete_prediction(task_id: str, type: str):
         status="success",
         message="Result successfully deleted"
     )
+"""

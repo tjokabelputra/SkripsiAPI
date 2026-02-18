@@ -196,8 +196,8 @@ def download_result(task_id: str):
     with open(json_path, "r") as f:
         result_json = json.load(f)
 
-    pca_values = result_json.get("pca")
-    if pca_values is None:
+    features_value = result_json.get("features")
+    if features_value is None:
         return JSONResponse(
             status_code=500,
             content=ResponseMessage(
@@ -218,7 +218,7 @@ def download_result(task_id: str):
 
     result_data = ExtractionResultData(
         metadata=metadata,
-        pca=pca_values
+        features=features_value
     )
 
     return ResponseMessage(

@@ -3,9 +3,9 @@ import tempfile
 import time
 from app.apkAnalyzer import analyze_apk, FEATURE_CSV
 from app.services.feature_encoder import save_encoded_csv
-from app.services.pca_processor import pca_feature
 from app.services.task_manager import task_store
 from app.utils.datetime_utils import iso_now
+from app.services.json_helper import csv_to_json
 
 def background_extract(task_id: str, apk_bytes: bytes, filename_hint: str):
     start_time = time.time()
@@ -47,7 +47,7 @@ def background_extract(task_id: str, apk_bytes: bytes, filename_hint: str):
         )
 
         #Save PCA JSON
-        json_path = pca_feature(
+        json_path = csv_to_json(
             input_csv=csv_path,
             extraction_id=task_id,
             metadata=metadata

@@ -25,4 +25,4 @@ class ExtractionStatus(BaseModel):
 
 class ExtractionResultData(BaseModel):
     metadata: ExtractionMetadata
-    pca: List[float]
+    features: List[int]
